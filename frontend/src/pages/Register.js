@@ -53,12 +53,14 @@ export default function Register() {
           <label style={styles.label}>
             Link a dataset User ID (for personalized recommendations):
           </label>
-          <select style={{...styles.input, ...styles.select}}
+          <select
+            style={styles.select}
             value={form.modelUserId}
-            onChange={e => setForm({...form, modelUserId: e.target.value})}>
-            <option value="">-- Select a User ID --</option>
+            onChange={e => setForm({...form, modelUserId: e.target.value})}
+          >
+            <option value="" style={styles.option}>-- Select a User ID --</option>
             {sampleUsers.map(uid => (
-              <option key={uid} value={uid}>User {uid}</option>
+              <option key={uid} value={uid} style={styles.option}>User {uid}</option>
             ))}
           </select>
           <button style={styles.btn} type="submit">Create Account</button>
@@ -107,7 +109,23 @@ const styles = {
     boxSizing: "border-box", outline: "none",
     boxShadow: "0 0 6px rgba(255,0,255,0.2)",
   },
-  select: { color: "white" },
+  select: {
+    display: "block", width: "100%", marginBottom: "14px",
+    padding: "12px", borderRadius: "8px",
+    border: "1px solid #ff00ff",
+    background: "#0d0d0d",           // ← solid dark background
+    color: "white", fontSize: "1rem",
+    boxSizing: "border-box", outline: "none",
+    boxShadow: "0 0 6px rgba(255,0,255,0.2)",
+    appearance: "none",              // ← remove browser default arrow styling
+    WebkitAppearance: "none",
+    MozAppearance: "none",
+    cursor: "pointer",
+  },
+  option: {
+    background: "#0d0d0d",
+    color: "white",
+  },
   label: {
     fontSize: "0.82rem", color: "#aaa",
     marginBottom: "6px", display: "block", textAlign: "left",
