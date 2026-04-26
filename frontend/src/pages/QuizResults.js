@@ -4,15 +4,13 @@ import RecipeCard from "../components/RecipeCard";
 import API from "../api";
 
 export default function QuizResults() {
-  const [recipes,  setRecipes]  = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState("");
-  const [filters,  setFilters]  = useState(null);
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState("");
+  const [filters, setFilters] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchQuizRecs();
-  }, []);
+  useEffect(() => { fetchQuizRecs(); }, []);
 
   const fetchQuizRecs = async () => {
     setLoading(true);
@@ -28,107 +26,181 @@ export default function QuizResults() {
   };
 
   return (
-    <div style={{ maxWidth:960, margin:"0 auto", padding:24 }}>
+    <div style={styles.page}>
+      <div style={styles.overlay} />
+      <div style={styles.content}>
 
-      {/* Header */}
-      <div style={{ background:"linear-gradient(135deg,#1a1a2e,#16213e)",
-                    borderRadius:12, padding:24,
-                    color:"white", marginBottom:24 }}>
-        <h2 style={{ margin:"0 0 8px" }}>
-           Your Personalized Recommendations!
-        </h2>
-        <p style={{ color:"#aaa", margin:"0 0 16px" }}>
-          Based on your quiz answers, here are recipes we think you'll love
-        </p>
-        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <button onClick={fetchQuizRecs}
-            style={{ background:"#e94560", color:"white",
-                     border:"none", padding:"8px 20px",
-                     borderRadius:8, cursor:"pointer",
-                     fontWeight:"bold" }}>
-             Refresh
-          </button>
-          <button onClick={() => navigate("/quiz")}
-            style={{ background:"transparent", color:"white",
-                     border:"1px solid white", padding:"8px 20px",
-                     borderRadius:8, cursor:"pointer" }}>
-            Retake Quiz
-          </button>
-          <button onClick={() => navigate("/recommend")}
-            style={{ background:"transparent", color:"#aaa",
-                     border:"1px solid #555", padding:"8px 20px",
-                     borderRadius:8, cursor:"pointer" }}>
-             AI Recommendations
-          </button>
+        {/* Header card */}
+        <div style={styles.headerCard}>
+          <h2 style={styles.heading}>Your Personalized Recipes!</h2>
+          <p style={styles.quote}>
+            "Based on your quiz answers, here are recipes we think you'll love"
+          </p>
+          <div style={styles.btnRow}>
+            <button onClick={fetchQuizRecs} style={styles.btnCyan}>
+              Refresh
+            </button>
+            <button onClick={() => navigate("/quiz")} style={styles.btnOutline}>
+              Retake Quiz
+            </button>
+            <button onClick={() => navigate("/recommend")} style={styles.btnGhost}>
+              AI Recommendations
+            </button>
+          </div>
         </div>
+
+        {/* Preference tags */}
+        {filters && (
+          <div style={styles.tagsBox}>
+            <p style={styles.tagsLabel}>Your Preference Keywords:</p>
+            <div style={styles.tagsRow}>
+              {filters.keywords?.slice(0, 6).map((k, i) => (
+                <span key={i} style={styles.tag}>{k}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading && (
+          <div style={styles.loadingBox}>
+            <div style={styles.spinner} />
+            <p style={styles.loadingText}>Finding your perfect recipes...</p>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && <p style={styles.error}>{error}</p>}
+
+        {/* Results */}
+        {!loading && recipes.length > 0 && (
+          <>
+            <p style={styles.countText}>
+              Found <span style={styles.countNum}>{recipes.length}</span> recipes matching your preferences
+            </p>
+            <div style={styles.grid}>
+              {recipes.map((r, i) => <RecipeCard key={i} recipe={r} />)}
+            </div>
+          </>
+        )}
+
+        {/* Empty state */}
+        {!loading && recipes.length === 0 && !error && (
+          <div style={styles.emptyBox}>
+            <p style={styles.emptyText}>No recipes found for your preferences.</p>
+            <button onClick={() => navigate("/quiz")} style={styles.btnCyan}>
+              Try Different Preferences
+            </button>
+          </div>
+        )}
+
       </div>
-
-      {/* Preference summary */}
-      {filters && (
-        <div style={{ background:"#f8f9fa", borderRadius:10,
-                      padding:16, marginBottom:20 }}>
-          <p style={{ margin:"0 0 8px", fontWeight:"bold",
-                      color:"#1a1a2e" }}>
-            Your Preferences Summary:
-          </p>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-            {filters.keywords?.slice(0,6).map((k,i) => (
-              <span key={i}
-                style={{ background:"#1a1a2e", color:"white",
-                         padding:"4px 12px", borderRadius:20,
-                         fontSize:"0.8rem" }}>
-                {k}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {loading && (
-        <div style={{ textAlign:"center", padding:60 }}>
-          <p style={{ fontSize:"1.2rem" }}>
-            Finding your perfect recipes...
-          </p>
-        </div>
-      )}
-
-      {error && (
-        <p style={{ color:"red", background:"#fff0f0",
-                    padding:16, borderRadius:8 }}>
-           {error}
-        </p>
-      )}
-
-      {/* Recipe grid */}
-      {!loading && recipes.length > 0 && (
-        <>
-          <p style={{ color:"#666", marginBottom:16 }}>
-            Found <b>{recipes.length}</b> recipes matching your preferences
-          </p>
-          <div style={{ display:"grid",
-                        gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",
-                        gap:20 }}>
-            {recipes.map((r, i) => (
-              <RecipeCard key={i} recipe={r} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {!loading && recipes.length === 0 && !error && (
-        <div style={{ textAlign:"center", padding:60 }}>
-          <p style={{ fontSize:"1.1rem", color:"#666" }}>
-             No recipes found for your preferences.
-          </p>
-          <button onClick={() => navigate("/quiz")}
-            style={{ background:"#1a1a2e", color:"white",
-                     border:"none", padding:"12px 24px",
-                     borderRadius:8, cursor:"pointer",
-                     marginTop:16 }}>
-            Try Different Preferences
-          </button>
-        </div>
-      )}
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: "100vh", position: "relative",
+    backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80')`,
+    backgroundSize: "cover", backgroundPosition: "center",
+    backgroundAttachment: "fixed",
+  },
+  overlay: {
+    position: "fixed", inset: 0,
+    background: "rgba(0,0,0,0.88)", zIndex: 0,
+  },
+  content: {
+    position: "relative", zIndex: 1,
+    maxWidth: 960, margin: "0 auto", padding: 24,
+  },
+  headerCard: {
+    background: "rgba(0,0,0,0.75)",
+    border: "1px solid #00fff7",
+    boxShadow: "0 0 30px rgba(0,255,247,0.3)",
+    borderRadius: 16, padding: "28px 32px",
+    marginBottom: 20, marginTop: 20,
+  },
+  heading: {
+    color: "#fff", fontSize: "1.8rem",
+    fontWeight: "800", margin: "0 0 8px",
+    textShadow: "0 0 16px #00fff7",
+  },
+  quote: {
+    fontSize: "0.85rem", fontStyle: "italic",
+    color: "#00fff7", margin: "0 0 20px",
+    textShadow: "0 0 8px #00fff7",
+  },
+  btnRow: { display: "flex", gap: 10, flexWrap: "wrap" },
+  btnCyan: {
+    background: "transparent", color: "#00fff7",
+    border: "2px solid #00fff7", padding: "9px 22px",
+    borderRadius: 8, cursor: "pointer",
+    fontWeight: "bold", fontSize: "0.9rem",
+    boxShadow: "0 0 14px rgba(0,255,247,0.4)",
+  },
+  btnOutline: {
+    background: "transparent", color: "#fff",
+    border: "1px solid rgba(255,255,255,0.3)",
+    padding: "9px 22px", borderRadius: 8,
+    cursor: "pointer", fontSize: "0.9rem",
+  },
+  btnGhost: {
+    background: "transparent", color: "#555",
+    border: "1px solid #333", padding: "9px 22px",
+    borderRadius: 8, cursor: "pointer", fontSize: "0.9rem",
+  },
+  tagsBox: {
+    background: "rgba(0,0,0,0.6)",
+    border: "1px solid rgba(0,255,247,0.15)",
+    borderRadius: 10, padding: "14px 18px",
+    marginBottom: 20,
+  },
+  tagsLabel: {
+    color: "#00fff7", fontSize: "0.82rem",
+    margin: "0 0 10px", fontWeight: "600",
+    textShadow: "0 0 6px #00fff7",
+  },
+  tagsRow: { display: "flex", flexWrap: "wrap", gap: 8 },
+  tag: {
+    background: "rgba(0,255,247,0.1)",
+    border: "1px solid rgba(0,255,247,0.3)",
+    color: "#00fff7", padding: "4px 14px",
+    borderRadius: 20, fontSize: "0.8rem",
+    fontWeight: "500",
+  },
+  loadingBox: { textAlign: "center", padding: "60px 0" },
+  spinner: {
+    width: 48, height: 48,
+    border: "3px solid rgba(0,255,247,0.2)",
+    borderTop: "3px solid #00fff7",
+    borderRadius: "50%", margin: "0 auto 16px",
+    animation: "spin 1s linear infinite",
+  },
+  loadingText: {
+    color: "#00fff7", fontSize: "1.1rem",
+    textShadow: "0 0 10px #00fff7",
+  },
+  error: {
+    color: "#ff4d4d",
+    background: "rgba(255,77,77,0.1)",
+    border: "1px solid #ff4d4d",
+    padding: 14, borderRadius: 8,
+  },
+  countText: {
+    color: "#aaa", marginBottom: 16, fontSize: "0.9rem",
+  },
+  countNum: {
+    color: "#00fff7", fontWeight: "bold",
+    textShadow: "0 0 8px #00fff7",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+    gap: 20,
+  },
+  emptyBox: { textAlign: "center", padding: "60px 0" },
+  emptyText: {
+    color: "#aaa", fontSize: "1rem", marginBottom: 20,
+  },
+};

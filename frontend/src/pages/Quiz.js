@@ -1,115 +1,114 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import API from "../api";
 
 const QUESTIONS = [
   {
     id: "cuisine",
-    question: " What cuisine do you enjoy most?",
+    question: "What cuisine do you enjoy most?",
     options: [
-      { value:"italian",  label:" Italian",  emoji:"" },
-      { value:"asian",    label:" Asian",    emoji:"" },
-      { value:"american", label:" American", emoji:"" },
-      { value:"indian",   label:" Indian",   emoji:"" },
-      { value:"mexican",  label:"Mexican",  emoji:"" },
-      { value:"any",      label:"Any / Mix",emoji:"" },
+      { value: "italian",  label: "Italian" },
+      { value: "asian",    label: "Asian" },
+      { value: "american", label: "American" },
+      { value: "indian",   label: "Indian" },
+      { value: "mexican",  label: "Mexican" },
+      { value: "any",      label: "Any / Mix" },
     ]
   },
   {
     id: "mealType",
     question: "What meal do you want recipes for?",
     options: [
-      { value:"breakfast", label:" Breakfast", emoji:"" },
-      { value:"lunch",     label:" Lunch",     emoji:"" },
-      { value:"dinner",    label:" Dinner",    emoji:"" },
-      { value:"snack",     label:" Snack",     emoji:"" },
-      { value:"dessert",   label:" Dessert",   emoji:"" },
+      { value: "breakfast", label: "Breakfast" },
+      { value: "lunch",     label: "Lunch" },
+      { value: "dinner",    label: "Dinner" },
+      { value: "snack",     label: "Snack" },
+      { value: "dessert",   label: "Dessert" },
     ]
   },
   {
     id: "cookingTime",
-    question: " How much time can you spend cooking?",
+    question: "How much time can you spend cooking?",
     options: [
-      { value:"quick",    label:" Under 15 mins", emoji:"" },
-      { value:"medium",   label:" 15–30 mins",    emoji:"" },
-      { value:"normal",   label:" 30–60 mins",    emoji:"" },
-      { value:"long",     label:" Over 1 hour",   emoji:"" },
+      { value: "quick",  label: "Under 15 mins" },
+      { value: "medium", label: "15–30 mins" },
+      { value: "normal", label: "30–60 mins" },
+      { value: "long",   label: "Over 1 hour" },
     ]
   },
   {
     id: "diet",
     question: "Do you follow any diet?",
     options: [
-      { value:"none",         label:" No restriction",  emoji:"" },
-      { value:"vegetarian",   label:" Vegetarian",      emoji:"" },
-      { value:"vegan",        label:" Vegan",           emoji:"" },
-      { value:"low_calorie",  label:" Low Calorie",     emoji:"" },
-      { value:"high_protein", label:" High Protein",   emoji:"" },
+      { value: "none",         label: "No restriction" },
+      { value: "vegetarian",   label: "Vegetarian" },
+      { value: "vegan",        label: "Vegan" },
+      { value: "low_calorie",  label: "Low Calorie" },
+      { value: "high_protein", label: "High Protein" },
     ]
   },
   {
     id: "spiceLevel",
     question: "How spicy do you like your food?",
     options: [
-      { value:"mild",    label:" Mild",         emoji:"" },
-      { value:"medium",  label:" Medium",       emoji:"" },
-      { value:"spicy",   label:" Spicy",        emoji:"" },
-      { value:"very_spicy",label:" Very Spicy", emoji:"" },
+      { value: "mild",       label: "Mild" },
+      { value: "medium",     label: "Medium" },
+      { value: "spicy",      label: "Spicy" },
+      { value: "very_spicy", label: "Very Spicy" },
     ]
   },
   {
     id: "healthGoal",
-    question: " What is your main health goal?",
+    question: "What is your main health goal?",
     options: [
-      { value:"lose_weight",   label:" Lose Weight",    emoji:"" },
-      { value:"build_muscle",  label:"Build Muscle",   emoji:"" },
-      { value:"eat_healthy",   label:" Eat Healthy",    emoji:"" },
-      { value:"enjoy_food",    label:" Just Enjoy Food",emoji:"" },
-      { value:"no_goal",       label:"No Specific Goal",emoji:"" },
+      { value: "lose_weight",  label: "Lose Weight" },
+      { value: "build_muscle", label: "Build Muscle" },
+      { value: "eat_healthy",  label: "Eat Healthy" },
+      { value: "enjoy_food",   label: "Just Enjoy Food" },
+      { value: "no_goal",      label: "No Specific Goal" },
     ]
   },
   {
     id: "allergies",
-    question: " Any food allergies or things you avoid?",
+    question: "Any food allergies or things you avoid?",
     options: [
-      { value:"none",     label:"None",        emoji:"" },
-      { value:"nuts",     label:" No Nuts",     emoji:"" },
-      { value:"dairy",    label:" No Dairy",    emoji:"" },
-      { value:"gluten",   label:" No Gluten",   emoji:"" },
-      { value:"seafood",  label:" No Seafood",  emoji:"" },
+      { value: "none",    label: "None" },
+      { value: "nuts",    label: "No Nuts" },
+      { value: "dairy",   label: "No Dairy" },
+      { value: "gluten",  label: "No Gluten" },
+      { value: "seafood", label: "No Seafood" },
     ]
   },
   {
     id: "cookingSkill",
-    question: " What is your cooking skill level?",
+    question: "What is your cooking skill level?",
     options: [
-      { value:"beginner",     label:" Beginner",      emoji:"" },
-      { value:"intermediate", label:" Intermediate",  emoji:"" },
-      { value:"advanced",     label:" Advanced",      emoji:"" },
-      { value:"chef",         label:" Professional Chef", emoji:"" },
+      { value: "beginner",     label: "Beginner" },
+      { value: "intermediate", label: "Intermediate" },
+      { value: "advanced",     label: "Advanced" },
+      { value: "chef",         label: "Professional Chef" },
     ]
   },
   {
     id: "servings",
     question: "How many people do you usually cook for?",
     options: [
-      { value:"1",    label:" Just Me",      emoji:"" },
-      { value:"2",    label:" 2 People",     emoji:"" },
-      { value:"4",    label:"Family (4)",  emoji:"👨‍👩‍👧" },
-      { value:"many", label:" Large Group",  emoji:"" },
+      { value: "1",    label: "Just Me" },
+      { value: "2",    label: "2 People" },
+      { value: "4",    label: "Family (4)" },
+      { value: "many", label: "Large Group" },
     ]
   },
   {
     id: "favoriteIngredient",
-    question: " What's your favourite main ingredient?",
+    question: "What's your favourite main ingredient?",
     options: [
-      { value:"chicken",   label:" Chicken",    emoji:"" },
-      { value:"beef",      label:" Beef",       emoji:"" },
-      { value:"fish",      label:" Fish",       emoji:"" },
-      { value:"vegetable", label:" Vegetables", emoji:"" },
-      { value:"pasta",     label:" Pasta",      emoji:"" },
-      { value:"egg",       label:" Eggs",       emoji:"" },
+      { value: "chicken",   label: "Chicken" },
+      { value: "beef",      label: "Beef" },
+      { value: "fish",      label: "Fish" },
+      { value: "vegetable", label: "Vegetables" },
+      { value: "pasta",     label: "Pasta" },
+      { value: "egg",       label: "Eggs" },
     ]
   }
 ];
@@ -118,11 +117,11 @@ export default function Quiz() {
   const [step,    setStep]    = useState(0);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
-  const { user, login, token } = useAuth();
+  const [hovered, setHovered] = useState(null);
   const navigate = useNavigate();
 
   const current  = QUESTIONS[step];
-  const progress = ((step) / QUESTIONS.length) * 100;
+  const progress = (step / QUESTIONS.length) * 100;
 
   const handleAnswer = async (value) => {
     const newAnswers = { ...answers, [current.id]: value };
@@ -131,7 +130,6 @@ export default function Quiz() {
     if (step < QUESTIONS.length - 1) {
       setStep(step + 1);
     } else {
-      // Last question — save and get recommendations
       setLoading(true);
       try {
         await API.post("/quiz/save", { answers: newAnswers });
@@ -145,21 +143,14 @@ export default function Quiz() {
     }
   };
 
-  const handleBack = () => {
-    if (step > 0) setStep(step - 1);
-  };
-
   if (loading) {
     return (
-      <div style={styles.loadingPage}>
+      <div style={styles.page}>
+        <div style={styles.overlay} />
         <div style={styles.loadingBox}>
           <div style={styles.spinner} />
-          <p style={styles.loadingText}>
-            🍳 Cooking up your recommendations...
-          </p>
-          <p style={styles.loadingSubText}>
-            Analyzing your preferences
-          </p>
+          <p style={styles.loadingText}>Cooking up your recommendations...</p>
+          <p style={styles.loadingSub}>Analyzing your preferences</p>
         </div>
       </div>
     );
@@ -167,46 +158,52 @@ export default function Quiz() {
 
   return (
     <div style={styles.page}>
+      <div style={styles.overlay} />
       <div style={styles.card}>
 
+        {/* Header */}
+        <h2 style={styles.heading}>Taste Quiz</h2>
+        <p style={styles.quote}>"Tell us what you love, we'll find the perfect recipe"</p>
+
         {/* Progress bar */}
-        <div style={styles.progressWrapper}>
-          <div style={styles.progressBar}>
-            <div style={{ ...styles.progressFill,
-                          width: `${progress}%` }} />
-          </div>
-          <p style={styles.progressText}>
-            Question {step + 1} of {QUESTIONS.length}
-          </p>
+        <div style={styles.progressBar}>
+          <div style={{ ...styles.progressFill, width: `${progress}%` }} />
         </div>
+        <p style={styles.progressText}>
+          Question {step + 1} of {QUESTIONS.length}
+        </p>
 
         {/* Question */}
-        <h2 style={styles.question}>{current.question}</h2>
+        <h3 style={styles.question}>{current.question}</h3>
 
         {/* Options */}
         <div style={styles.optionsGrid}>
           {current.options.map(opt => (
-            <button key={opt.value}
+            <button
+              key={opt.value}
               onClick={() => handleAnswer(opt.value)}
-              style={{ ...styles.optionBtn,
-                       ...(answers[current.id] === opt.value
-                           ? styles.optionBtnSelected : {}) }}>
-              <span style={styles.optionEmoji}>{opt.emoji}</span>
-              <span style={styles.optionLabel}>{opt.label}</span>
+              onMouseEnter={() => setHovered(opt.value)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                ...styles.optionBtn,
+                ...(answers[current.id] === opt.value ? styles.optionSelected : {}),
+                ...(hovered === opt.value && answers[current.id] !== opt.value
+                  ? styles.optionHover : {}),
+              }}>
+              {opt.label}
             </button>
           ))}
         </div>
 
         {/* Back button */}
         {step > 0 && (
-          <button onClick={handleBack} style={styles.backBtn}>
+          <button onClick={() => setStep(step - 1)} style={styles.backBtn}>
             ← Back
           </button>
         )}
 
         {/* Skip */}
-        <button onClick={() => navigate("/recommend")}
-          style={styles.skipBtn}>
+        <button onClick={() => navigate("/recommend")} style={styles.skipBtn}>
           Skip quiz → use dataset recommendations
         </button>
       </div>
@@ -215,52 +212,115 @@ export default function Quiz() {
 }
 
 const styles = {
-  page:             { minHeight:"100vh", background:"linear-gradient(135deg,#1a1a2e,#16213e)",
-                      display:"flex", alignItems:"center",
-                      justifyContent:"center", padding:20 },
-  card:             { background:"white", borderRadius:16,
-                      padding:32, maxWidth:580, width:"100%",
-                      boxShadow:"0 20px 60px rgba(0,0,0,0.3)" },
-  progressWrapper:  { marginBottom:24 },
-  progressBar:      { background:"#eee", borderRadius:10,
-                      height:8, marginBottom:8 },
-  progressFill:     { background:"linear-gradient(90deg,#1a1a2e,#e94560)",
-                      height:8, borderRadius:10,
-                      transition:"width 0.4s ease" },
-  progressText:     { color:"#999", fontSize:"0.85rem",
-                      margin:0, textAlign:"right" },
-  question:         { color:"#1a1a2e", fontSize:"1.3rem",
-                      marginBottom:24, lineHeight:1.4 },
-  optionsGrid:      { display:"grid",
-                      gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",
-                      gap:12, marginBottom:20 },
-  optionBtn:        { padding:"14px 12px", borderRadius:10,
-                      border:"2px solid #eee", background:"white",
-                      cursor:"pointer", textAlign:"left",
-                      display:"flex", alignItems:"center",
-                      gap:10, transition:"all 0.2s",
-                      fontSize:"0.9rem" },
-  optionBtnSelected:{ border:"2px solid #1a1a2e",
-                      background:"#f0f4ff" },
-  optionEmoji:      { fontSize:"1.4rem" },
-  optionLabel:      { color:"#333", fontWeight:"500" },
-  backBtn:          { background:"none", border:"1px solid #ddd",
-                      padding:"8px 20px", borderRadius:8,
-                      cursor:"pointer", color:"#666",
-                      marginRight:12 },
-  skipBtn:          { background:"none", border:"none",
-                      color:"#999", cursor:"pointer",
-                      fontSize:"0.8rem", textDecoration:"underline",
-                      marginTop:8 },
-  loadingPage:      { minHeight:"100vh",
-                      background:"linear-gradient(135deg,#1a1a2e,#16213e)",
-                      display:"flex", alignItems:"center",
-                      justifyContent:"center" },
-  loadingBox:       { textAlign:"center", color:"white" },
-  spinner:          { width:50, height:50, border:"4px solid #444",
-                      borderTop:"4px solid #e94560",
-                      borderRadius:"50%", margin:"0 auto 20px",
-                      animation:"spin 1s linear infinite" },
-  loadingText:      { fontSize:"1.3rem", marginBottom:8 },
-  loadingSubText:   { color:"#aaa", fontSize:"0.9rem" }
+  page: {
+    minHeight: "100vh", display: "flex",
+    alignItems: "center", justifyContent: "center",
+    position: "relative",
+    backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80')`,
+    backgroundSize: "cover", backgroundPosition: "center",
+    padding: 20,
+  },
+  overlay: {
+    position: "fixed", inset: 0,
+    background: "rgba(0,0,0,0.88)", zIndex: 0,
+  },
+  card: {
+    position: "relative", zIndex: 1,
+    background: "rgba(0,0,0,0.75)",
+    border: "1px solid #00fff7",
+    boxShadow: "0 0 30px rgba(0,255,247,0.3)",
+    borderRadius: 16, padding: "36px 32px",
+    maxWidth: 580, width: "100%",
+    textAlign: "center",
+  },
+  heading: {
+    color: "#fff", fontSize: "1.8rem",
+    fontWeight: "800", margin: "0 0 6px",
+    textShadow: "0 0 16px #00fff7",
+  },
+  quote: {
+    fontSize: "0.82rem", fontStyle: "italic",
+    color: "#00fff7", marginBottom: 24,
+    textShadow: "0 0 8px #00fff7",
+  },
+  progressBar: {
+    background: "rgba(0,255,247,0.1)",
+    borderRadius: 10, height: 6,
+    marginBottom: 8,
+    border: "1px solid rgba(0,255,247,0.2)",
+  },
+  progressFill: {
+    background: "#00fff7",
+    height: 6, borderRadius: 10,
+    boxShadow: "0 0 10px #00fff7",
+    transition: "width 0.4s ease",
+  },
+  progressText: {
+    color: "#00fff7", fontSize: "0.78rem",
+    margin: "0 0 20px", textAlign: "right",
+    opacity: 0.7,
+  },
+  question: {
+    color: "#fff", fontSize: "1.2rem",
+    marginBottom: 20, lineHeight: 1.5,
+    fontWeight: "600",
+  },
+  optionsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gap: 10, marginBottom: 20,
+  },
+  optionBtn: {
+    padding: "12px 14px",
+    background: "rgba(0,255,247,0.03)",
+    border: "1px solid rgba(0,255,247,0.3)",
+    borderRadius: 8, cursor: "pointer",
+    color: "#ccc", fontSize: "0.9rem",
+    fontWeight: "500", textAlign: "center",
+    transition: "all 0.2s",
+  },
+  optionHover: {
+    background: "rgba(0,255,247,0.08)",
+    border: "1px solid #00fff7",
+    color: "#fff",
+  },
+  optionSelected: {
+    background: "rgba(0,255,247,0.15)",
+    border: "2px solid #00fff7",
+    color: "#00fff7",
+    boxShadow: "0 0 12px rgba(0,255,247,0.3)",
+  },
+  backBtn: {
+    background: "transparent",
+    border: "1px solid rgba(0,255,247,0.3)",
+    padding: "8px 20px", borderRadius: 8,
+    cursor: "pointer", color: "#aaa",
+    marginRight: 12, fontSize: "0.9rem",
+  },
+  skipBtn: {
+    background: "none", border: "none",
+    color: "#444", cursor: "pointer",
+    fontSize: "0.78rem", textDecoration: "underline",
+    marginTop: 10,
+  },
+  loadingBox: {
+    position: "relative", zIndex: 1,
+    textAlign: "center", color: "white",
+    background: "rgba(0,0,0,0.75)",
+    border: "1px solid #00fff7",
+    boxShadow: "0 0 30px rgba(0,255,247,0.3)",
+    borderRadius: 16, padding: "50px 40px",
+  },
+  spinner: {
+    width: 48, height: 48,
+    border: "3px solid rgba(0,255,247,0.2)",
+    borderTop: "3px solid #00fff7",
+    borderRadius: "50%", margin: "0 auto 20px",
+    animation: "spin 1s linear infinite",
+  },
+  loadingText: {
+    color: "#00fff7", fontSize: "1.2rem",
+    marginBottom: 8, textShadow: "0 0 10px #00fff7",
+  },
+  loadingSub: { color: "#555", fontSize: "0.85rem" },
 };
