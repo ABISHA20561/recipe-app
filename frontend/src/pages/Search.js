@@ -27,16 +27,16 @@ export default function Search() {
       <div style={styles.overlay} />
       <div style={styles.content}>
         <div style={styles.heroSection}>
-          <p style={styles.quote}>"Cooking is love made visible 🍽️"</p>
+          <p style={styles.quote}>"Cooking is love made visible"</p>
           <h2 style={styles.heading}>Search Recipes</h2>
           <p style={styles.subtext}>Discover thousands of delicious recipes</p>
         </div>
         <input style={styles.searchBox}
           type="text"
-          placeholder="🔍 Type a recipe name e.g. chicken pasta..."
+          placeholder="Type a recipe name e.g. chicken pasta..."
           value={query}
           onChange={e => setQuery(e.target.value)} />
-        {loading && <p style={styles.loading}>🍳 Searching...</p>}
+        {loading && <p style={styles.loading}>Searching...</p>}
         <div style={styles.grid}>
           {results.map((r, i) => (
             <RecipeCard key={i} recipe={r} />
@@ -59,7 +59,7 @@ const styles = {
   },
   overlay: {
     position: "fixed", inset: 0,
-    background: "rgba(10,10,30,0.75)", zIndex: 0,
+    background: "rgba(0,0,0,0.85)", zIndex: 0,
   },
   content: {
     position: "relative", zIndex: 1,
@@ -71,21 +71,29 @@ const styles = {
   },
   quote: {
     fontSize: "1rem", fontStyle: "italic",
-    color: "#ffd700", marginBottom: "8px",
+    color: "#00fff7", marginBottom: "8px",
+    textShadow: "0 0 10px #00fff7",
   },
   heading: {
-    fontSize: "2rem", fontWeight: "800",
-    color: "white", margin: "0 0 8px",
+    fontSize: "2.2rem", fontWeight: "800",
+    color: "#fff", margin: "0 0 8px",
+    textShadow: "0 0 20px #00fff7",
   },
   subtext: { color: "#aaa", marginBottom: "0" },
   searchBox: {
     width: "100%", padding: "16px", fontSize: "1rem",
-    borderRadius: "12px", border: "none",
+    borderRadius: "10px",
+    border: "2px solid #00fff7",
     marginBottom: "20px", boxSizing: "border-box",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-    background: "rgba(255,255,255,0.95)",
+    background: "rgba(0,0,0,0.7)",
+    color: "white",
+    boxShadow: "0 0 12px #00fff7",
+    outline: "none",
   },
-  loading: { color: "#ffd700", textAlign: "center", fontSize: "1.1rem" },
+  loading: {
+    color: "#00fff7", textAlign: "center",
+    fontSize: "1.1rem", textShadow: "0 0 8px #00fff7",
+  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))",

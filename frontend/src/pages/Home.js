@@ -12,9 +12,9 @@ export default function Home() {
           that understands your healthy <b>&</b> hedonic preferences.
         </p>
         <div style={styles.btnRow}>
-          <Link to="/search" style={styles.btn}>🔍 Search Recipes</Link>
+          <Link to="/search" style={styles.btn}>Search Recipes</Link>
           <Link to="/recommend" style={{...styles.btn, ...styles.btnAlt}}>
-            ✨ Get Recommendations
+            Get Recommendations
           </Link>
         </div>
       </div>
@@ -24,18 +24,15 @@ export default function Home() {
 
 const styles = {
   container: {
-    minHeight: "90vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    minHeight: "90vh", display: "flex",
+    alignItems: "center", justifyContent: "center",
     backgroundImage: `url('https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1400&q=80')`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
+    backgroundSize: "cover", backgroundPosition: "center",
     position: "relative",
   },
   overlay: {
     position: "absolute", inset: 0,
-    background: "linear-gradient(135deg, rgba(26,26,46,0.85), rgba(233,69,96,0.4))",
+    background: "rgba(0,0,0,0.82)",
   },
   hero: {
     textAlign: "center", color: "white",
@@ -44,12 +41,17 @@ const styles = {
   },
   quote: {
     fontSize: "1rem", fontStyle: "italic",
-    color: "#ffd700", marginBottom: "16px",
+    color: "#00fff7", marginBottom: "20px",
     letterSpacing: "0.5px",
+    textShadow: "0 0 10px #00fff7",
   },
-  title: { fontSize: "2.8rem", marginBottom: "16px", fontWeight: "800" },
+  title: {
+    fontSize: "2.8rem", marginBottom: "16px",
+    fontWeight: "800", color: "#fff",
+    textShadow: "0 0 20px #00fff7, 0 0 40px #00fff7",
+  },
   sub: {
-    fontSize: "1.1rem", color: "#ddd",
+    fontSize: "1.1rem", color: "#aaa",
     maxWidth: "500px", margin: "0 auto 32px",
   },
   btnRow: {
@@ -57,14 +59,20 @@ const styles = {
     justifyContent: "center", flexWrap: "wrap",
   },
   btn: {
-    padding: "14px 28px", background: "#e94560",
-    color: "white", textDecoration: "none",
-    borderRadius: "8px", fontSize: "1rem", fontWeight: "bold",
-    boxShadow: "0 4px 15px rgba(233,69,96,0.4)",
+    padding: "14px 28px",
+    background: "transparent",
+    color: "#00fff7",
+    textDecoration: "none",
+    borderRadius: "8px",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    border: "2px solid #00fff7",
+    boxShadow: "0 0 12px #00fff7, inset 0 0 12px rgba(0,255,247,0.1)",
+    transition: "all 0.3s",
   },
   btnAlt: {
-    background: "rgba(255,255,255,0.15)",
-    border: "2px solid white",
-    backdropFilter: "blur(6px)",
+    color: "#ff00ff",
+    border: "2px solid #ff00ff",
+    boxShadow: "0 0 12px #ff00ff, inset 0 0 12px rgba(255,0,255,0.1)",
   },
 };
