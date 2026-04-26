@@ -17,6 +17,28 @@ const FOOD_IMAGES = [
   "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80",
   "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80",
   "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&q=80",
+  // NEW ONES ADDED BELOW
+  "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=80",
+  "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&q=80",
+  "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=400&q=80",
+  "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&q=80",
+  "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80",
+  "https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=400&q=80",
+  "https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=80",
+  "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80",
+  "https://images.unsplash.com/photo-1559847844-5315695dadae?w=400&q=80",
+  "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80",
+  "https://images.unsplash.com/photo-1561043433-aaf687c4cf04?w=400&q=80",
+  "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&q=80",
+  "https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&q=80",
+  "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80",
+  "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&q=80",
+  "https://images.unsplash.com/photo-1528736235302-52922df5c122?w=400&q=80",
+  "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?w=400&q=80",
+  "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400&q=80",
+  "https://images.unsplash.com/photo-1485963631004-f2f00b1d6606?w=400&q=80",
+  "https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&q=80",
+  "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?w=400&q=80",
 ];
 
 function getImageForRecipe(recipe) {
@@ -39,6 +61,26 @@ function getImageForRecipe(recipe) {
   if (name.includes("pork"))     return "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=400&q=80";
   if (name.includes("turkey"))   return "https://images.unsplash.com/photo-1574672280600-4accfa5b6f98?w=400&q=80";
   if (name.includes("cookie"))   return "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400&q=80";
+  if (name.includes("egg"))      return "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80";
+  if (name.includes("mushroom")) return "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&q=80";
+  if (name.includes("lemon"))    return "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=400&q=80";
+  if (name.includes("apple"))    return "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&q=80";
+  if (name.includes("banana"))   return "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=80";
+  if (name.includes("potato"))   return "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80";
+  if (name.includes("tomato"))   return "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&q=80";
+  if (name.includes("vegetable"))return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
+  if (name.includes("fruit"))    return "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80";
+  if (name.includes("sandwich")) return "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80";
+  if (name.includes("taco"))     return "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80";
+  if (name.includes("noodle"))   return "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80";
+  if (name.includes("sushi"))    return "https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=80";
+  if (name.includes("curry"))    return "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80";
+  if (name.includes("muffin"))   return "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=400&q=80";
+  if (name.includes("pancake"))  return "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=400&q=80";
+  if (name.includes("waffle"))   return "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&q=80";
+  if (name.includes("oat"))      return "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400&q=80";
+  if (name.includes("cheese"))   return "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&q=80";
+  if (name.includes("bacon"))    return "https://images.unsplash.com/photo-1528607929212-2636ec44253e?w=400&q=80";
 
   const idx = (recipe.id || recipe.recipe_idx || 0) % FOOD_IMAGES.length;
   return FOOD_IMAGES[idx];
