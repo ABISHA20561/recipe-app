@@ -333,7 +333,7 @@ const styles = {
     fontSize:"1.9rem", fontWeight:"800",
     textShadow:"0 0 20px #00fff7",
   },
-  subHeading: { color:"#888", margin:0, fontSize:"0.95rem" },
+  subHeading: { color:"#bbb", margin:0, fontSize:"0.95rem" },
   statsRow: {
     display:"grid", gridTemplateColumns:"repeat(3,1fr)",
     gap:16, marginBottom:24,
@@ -345,7 +345,8 @@ const styles = {
     borderRadius:12, padding:20, textAlign:"center",
   },
   statLabel: {
-    color:"#888", margin:"0 0 8px", fontSize:"0.85rem",
+    color:"#bbb",             /* ← was #888, now brighter */
+    margin:"0 0 8px", fontSize:"0.9rem",
     letterSpacing:"0.5px",
   },
   statValue: {
@@ -353,7 +354,7 @@ const styles = {
     color:"#fff", margin:"0 0 6px",
     textShadow:"0 0 14px #00fff7",
   },
-  statRank: { margin:0, fontSize:"0.8rem", fontWeight:"600" },
+  statRank: { margin:0, fontSize:"0.82rem", fontWeight:"600" },
   tabRow: { display:"flex", gap:10, marginBottom:20 },
   tabBtn: {
     padding:"10px 22px", borderRadius:8,
@@ -362,24 +363,26 @@ const styles = {
     transition:"all 0.2s", letterSpacing:"0.5px",
   },
   tableBox: {
-    background:"rgba(0,0,0,0.75)",
-    border:"1px solid rgba(0,255,247,0.2)",
-    boxShadow:"0 0 20px rgba(0,255,247,0.05)",
+    background:"rgba(0,0,0,0.80)",   /* ← slightly lighter box */
+    border:"1px solid rgba(0,255,247,0.25)",
+    boxShadow:"0 0 20px rgba(0,255,247,0.08)",
     borderRadius:12, padding:24,
   },
   tableNote: {
-    color:"#666", fontSize:"0.82rem", marginBottom:16,
+    color:"#999", fontSize:"0.82rem", marginBottom:16,
   },
   th: {
     color:"#00fff7", padding:"13px 16px",
     textAlign:"center", fontWeight:"700",
-    borderBottom:"1px solid rgba(0,255,247,0.3)",
-    fontSize:"0.9rem", letterSpacing:"0.5px",
+    borderBottom:"2px solid rgba(0,255,247,0.4)",
+    fontSize:"0.92rem", letterSpacing:"0.5px",
+    background:"rgba(0,255,247,0.06)",
   },
   td: {
     padding:"12px 16px", textAlign:"center",
-    borderBottom:"1px solid rgba(255,255,255,0.06)",
-    fontSize:"0.92rem",
+    borderBottom:"1px solid rgba(255,255,255,0.08)",
+    fontSize:"0.95rem",
+    color:"#e8e8e8",             /* ← THIS is the main fix — was #ccc */
   },
   metricBtn: {
     padding:"8px 18px", borderRadius:20,
