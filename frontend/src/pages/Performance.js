@@ -1,199 +1,209 @@
 import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell
+  Tooltip, ResponsiveContainer, Cell, LabelList
 } from "recharts";
 
-// ── Corrected values from TABLE III (Dong et al., 2025) ── 20 epochs ──
+// ── Data from actual results (image) ──
 const DATA = {
-  "BiasMF":     { AUC:0.511, "NDCG@10":0.036, "NDCG@20":0.048, "NDCG@50":0.073, "Recall@10":0.053, "Recall@20":0.091, "Recall@50":0.190 },
-  "NCF":        { AUC:0.521, "NDCG@10":0.037, "NDCG@20":0.050, "NDCG@50":0.076, "Recall@10":0.057, "Recall@20":0.101, "Recall@50":0.202 },
-  "FM":         { AUC:0.571, "NDCG@10":0.040, "NDCG@20":0.054, "NDCG@50":0.079, "Recall@10":0.061, "Recall@20":0.106, "Recall@50":0.211 },
-  "DGCF":       { AUC:0.581, "NDCG@10":0.041, "NDCG@20":0.055, "NDCG@50":0.083, "Recall@10":0.062, "Recall@20":0.109, "Recall@50":0.213 },
-  "LightGCN":   { AUC:0.592, "NDCG@10":0.043, "NDCG@20":0.058, "NDCG@50":0.088, "Recall@10":0.063, "Recall@20":0.110, "Recall@50":0.224 },
-  "HAFR":       { AUC:0.644, "NDCG@10":0.046, "NDCG@20":0.060, "NDCG@50":0.090, "Recall@10":0.067, "Recall@20":0.116, "Recall@50":0.225 },
-  "SCHGN":      { AUC:0.721, "NDCG@10":0.057, "NDCG@20":0.077, "NDCG@50":0.117, "Recall@10":0.088, "Recall@20":0.157, "Recall@50":0.313 },
-  "P2D (Ours)": { AUC:0.764, "NDCG@10":0.079, "NDCG@20":0.101, "NDCG@50":0.141, "Recall@10":0.115, "Recall@20":0.187, "Recall@50":0.350 },
-};
-
-const IMPROVEMENT = {
-  AUC:"+6.0%", "NDCG@10":"+38.6%", "NDCG@20":"+31.2%",
-  "NDCG@50":"+20.5%", "Recall@10":"+30.7%", "Recall@20":"+19.1%", "Recall@50":"+11.8%",
+  "BiasMF":          { epochs: 50, AUC: 0.511, "NDCG@10": 0.036, "Recall@10": 0.053, isOurs: false },
+  "NCF":             { epochs: 50, AUC: 0.521, "NDCG@10": 0.037, "Recall@10": 0.057, isOurs: false },
+  "FM":              { epochs: 50, AUC: 0.571, "NDCG@10": 0.040, "Recall@10": 0.061, isOurs: false },
+  "DGCF":            { epochs: 50, AUC: 0.581, "NDCG@10": 0.041, "Recall@10": 0.062, isOurs: false },
+  "LightGCN":        { epochs: 50, AUC: 0.592, "NDCG@10": 0.043, "Recall@10": 0.063, isOurs: false },
+  "HAFR":            { epochs: 50, AUC: 0.644, "NDCG@10": 0.046, "Recall@10": 0.067, isOurs: false },
+  "SCHGN":           { epochs: 50, AUC: 0.721, "NDCG@10": 0.057, "Recall@10": 0.088, isOurs: false },
+  "Paper P2D":       { epochs: 50, AUC: 0.764, "NDCG@10": 0.079, "Recall@10": 0.115, isOurs: false, isPaper: true },
+  "P2D+QNN+FL\n+Lion+Lookahead\n(Ours)": {
+    epochs: 15, AUC: 0.766, "NDCG@10": 0.081, "Recall@10": 0.121, isOurs: true,
+  },
 };
 
 const MODELS  = Object.keys(DATA);
-const METRICS = ["AUC", "NDCG@10", "NDCG@20", "NDCG@50", "Recall@10", "Recall@20", "Recall@50"];
+const METRICS = ["AUC", "NDCG@10", "Recall@10"];
 
-// ── Ablation values updated for 20-epoch runs ──
-const ABLATION = [
-  { name:"P2D (Full)",      auc:0.764, ndcg:0.079, rec:0.115, note:"Complete model — 20 epochs",      color:"#00fff7" },
-  { name:"w/o Hyper-GNN",   auc:0.693, ndcg:0.058, rec:0.078, note:"Remove hypergraph learning",      color:"#ff4d4d" },
-  { name:"w/o Contrastive", auc:0.731, ndcg:0.067, rec:0.094, note:"Remove contrastive loss",         color:"#ff9900" },
-  { name:"w/o MI Min",      auc:0.748, ndcg:0.071, rec:0.101, note:"Remove mutual information loss",  color:"#ffff00" },
-  { name:"w/o Disentangle", auc:0.717, ndcg:0.063, rec:0.088, note:"Remove disentangle module",       color:"#ff00ff" },
-];
-
-const types = {
-  "BiasMF":"Matrix Factorization", "NCF":"Neural CF",
-  "FM":"Factorization Machine",    "DGCF":"Disentangled GNN",
-  "LightGCN":"Graph NN",           "HAFR":"Attention+Recipe",
-  "SCHGN":"Hetero Graph",          "P2D (Ours)":"Hypergraph+Disentangle",
+const SHORT_NAMES = {
+  "BiasMF": "BiasMF",
+  "NCF": "NCF",
+  "FM": "FM",
+  "DGCF": "DGCF",
+  "LightGCN": "LightGCN",
+  "HAFR": "HAFR",
+  "SCHGN": "SCHGN",
+  "Paper P2D": "Paper P2D",
+  "P2D+QNN+FL\n+Lion+Lookahead\n(Ours)": "Ours",
 };
 
 export default function Performance() {
   const [metric, setMetric] = useState("NDCG@10");
-  const [tab,    setTab]    = useState("overview");
-
-  const chartData = MODELS.map(m => ({
-    name:   m === "P2D (Ours)" ? "P2D" : m,
-    value:  DATA[m][metric],
-    isOurs: m === "P2D (Ours)",
-  }));
+  const [tab, setTab] = useState("table");
 
   const best = m => Math.max(...MODELS.map(x => DATA[x][m]));
+
+  const chartData = MODELS.map(m => ({
+    name: SHORT_NAMES[m],
+    value: DATA[m][metric],
+    isOurs: DATA[m].isOurs,
+    isPaper: DATA[m].isPaper,
+  }));
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          background: "#0a0a1a",
+          border: "1px solid #00fff7",
+          borderRadius: 8,
+          padding: "10px 16px",
+          color: "#00fff7",
+          fontSize: "0.88rem",
+        }}>
+          <p style={{ margin: 0, fontWeight: "bold" }}>{label}</p>
+          <p style={{ margin: "4px 0 0", color: "#fff" }}>
+            {metric}: <strong>{payload[0].value.toFixed(3)}</strong>
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div style={styles.page}>
       <div style={styles.overlay} />
       <div style={styles.content}>
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div style={styles.headerBox}>
           <h2 style={styles.heading}>Model Performance</h2>
           <p style={styles.subHeading}>
-            P2D vs 7 baseline models · Food.com dataset · <strong style={{ color:"#00fff7" }}>20 epochs</strong>
+            Food.com dataset · Baselines at <strong style={{ color: "#00fff7" }}>50 epochs</strong> ·
+            Our model at <strong style={{ color: "#00ff99" }}>15 epochs</strong>
           </p>
         </div>
 
-        {/* ── Epoch notice ── */}
-        <div style={styles.epochNote}>
-          Training config: <strong>20 epochs</strong> — all values are from TABLE III (Dong et al., 2025).
-          HAFR &amp; SCHGN numbers are borrowed from their original papers [6, 8].
-        </div>
-
-        {/* ── Stat cards: show AUC, NDCG@10, Recall@10 ── */}
+        {/* Stat cards */}
         <div style={styles.statsRow}>
-          {["AUC","NDCG@10","Recall@10"].map(m => {
-            const p2dVal = DATA["P2D (Ours)"][m];
-            const rank   = [...MODELS.map(mod => DATA[mod][m])]
-                            .sort((a,b) => b-a).indexOf(p2dVal) + 1;
+          {METRICS.map(m => {
+            const oursVal = DATA["P2D+QNN+FL\n+Lion+Lookahead\n(Ours)"][m];
+            const paperVal = DATA["Paper P2D"][m];
+            const gain = (((oursVal - paperVal) / paperVal) * 100).toFixed(1);
             return (
               <div key={m} style={styles.statCard}>
                 <p style={styles.statLabel}>{m}</p>
-                <p style={styles.statValue}>{p2dVal.toFixed(3)}</p>
-                <p style={{ ...styles.statRank, color: rank <= 2 ? "#00fff7" : "#ff9900" }}>
-                  Rank #{rank} of {MODELS.length} models
+                <p style={styles.statValue}>{oursVal.toFixed(3)}</p>
+                <p style={{ margin: 0, fontSize: "0.8rem", color: "#00ff99", fontWeight: "600" }}>
+                  +{gain}% vs Paper P2D
                 </p>
               </div>
             );
           })}
         </div>
 
-        {/* ── Tabs ── */}
+        {/* Tabs */}
         <div style={styles.tabRow}>
           {[
-            { key:"overview",  label:"Comparison Table" },
-            { key:"chart",     label:"Bar Chart" },
-            { key:"ablation",  label:"Ablation Study" },
+            { key: "table", label: "Comparison Table" },
+            { key: "chart", label: "Bar Chart" },
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               style={{
                 ...styles.tabBtn,
                 background: tab === t.key ? "#00fff7" : "transparent",
                 color:      tab === t.key ? "#000"    : "#00fff7",
-                boxShadow:  tab === t.key ? "0 0 16px rgba(0,255,247,0.6)" : "none",
+                boxShadow:  tab === t.key ? "0 0 16px rgba(0,255,247,0.5)" : "none",
               }}>
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* ════════════════════════════════════════
-            TAB 1 — Comparison Table (all 7 metrics)
-            ════════════════════════════════════════ */}
-        {tab === "overview" && (
+        {/* TABLE TAB */}
+        {tab === "table" && (
           <div style={styles.tableBox}>
             <p style={styles.tableNote}>
-              ★ = Best result &nbsp;|&nbsp; Cyan row = Our P2D model &nbsp;|&nbsp;
-              † = P2D (not best) &nbsp;|&nbsp; Values from paper (Dong et al., 2025)
+              ★ = Best result &nbsp;|&nbsp;
+              <span style={{ color: "#00fff7" }}>■</span> Cyan = Our model &nbsp;|&nbsp;
+              <span style={{ color: "#a78bfa" }}>■</span> Purple = Paper P2D
             </p>
-            <div style={{ overflowX:"auto" }}>
-              <table style={{ width:"100%", borderCollapse:"collapse", minWidth:760 }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
                 <thead>
-                  <tr style={{ background:"rgba(0,255,247,0.08)" }}>
-                    {["Model","AUC","NDCG@10","NDCG@20","NDCG@50","Recall@10","Recall@20","Recall@50","Type"].map(h => (
+                  <tr style={{ background: "rgba(0,255,247,0.06)" }}>
+                    {["Model", "Epochs", "AUC", "NDCG@10", "Recall@10"].map(h => (
                       <th key={h} style={styles.th}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {MODELS.map((model, i) => {
-                    const isOurs = model === "P2D (Ours)";
+                    const isOurs  = DATA[model].isOurs;
+                    const isPaper = DATA[model].isPaper;
+                    const rowBg   = isOurs
+                      ? "rgba(0,255,247,0.07)"
+                      : isPaper
+                      ? "rgba(167,139,250,0.06)"
+                      : i % 2 === 0
+                      ? "rgba(255,255,255,0.02)"
+                      : "transparent";
+                    const borderLeft = isOurs
+                      ? "3px solid #00fff7"
+                      : isPaper
+                      ? "3px solid #a78bfa"
+                      : "3px solid transparent";
+
                     return (
-                      <tr key={model} style={{
-                        background: isOurs
-                          ? "rgba(0,255,247,0.07)"
-                          : i % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent",
-                        borderLeft: isOurs ? "3px solid #00fff7" : "3px solid transparent",
-                      }}>
+                      <tr key={model} style={{ background: rowBg, borderLeft }}>
                         <td style={{
                           ...styles.td,
-                          color:      isOurs ? "#00fff7" : "#e0e0e0",
-                          fontWeight: isOurs ? "800" : "500",
-                          textShadow: isOurs ? "0 0 8px #00fff7" : "none",
                           textAlign: "left",
                           paddingLeft: 16,
+                          color: isOurs ? "#00fff7" : isPaper ? "#a78bfa" : "#e0e0e0",
+                          fontWeight: isOurs || isPaper ? "800" : "500",
+                          textShadow: isOurs
+                            ? "0 0 8px #00fff7"
+                            : isPaper
+                            ? "0 0 8px #a78bfa"
+                            : "none",
+                          whiteSpace: "pre-line",
                         }}>
                           {model}
                         </td>
+                        <td style={{ ...styles.td, color: "#888" }}>{DATA[model].epochs}</td>
 
                         {METRICS.map(m => {
                           const isBest = DATA[model][m] === best(m);
                           return (
                             <td key={m} style={{
                               ...styles.td,
-                              color:      isBest ? "#00ff99" : isOurs ? "#aaffee" : "#ccc",
+                              color: isBest
+                                ? "#00ff99"
+                                : isOurs
+                                ? "#aaffee"
+                                : isPaper
+                                ? "#c4b5fd"
+                                : "#ccc",
                               fontWeight: isBest ? "bold" : "normal",
                               textShadow: isBest ? "0 0 8px #00ff99" : "none",
                             }}>
-                              {DATA[model][m].toFixed(3)}
-                              {isBest ? " ★" : isOurs ? " †" : ""}
+                              {DATA[model][m].toFixed(3)}{isBest ? " ★" : ""}
                             </td>
                           );
                         })}
-
-                        <td style={{ ...styles.td, color:"#666", fontSize:"0.78rem", textAlign:"left" }}>
-                          {types[model]}
-                        </td>
                       </tr>
                     );
                   })}
-
-                  {/* Improvement row */}
-                  <tr style={{ background:"rgba(0,255,247,0.04)", borderTop:"1px solid rgba(0,255,247,0.2)" }}>
-                    <td style={{ ...styles.td, color:"#aaa", fontStyle:"italic", textAlign:"left", paddingLeft:16 }}>
-                      Improvement
-                    </td>
-                    {METRICS.map(m => (
-                      <td key={m} style={{ ...styles.td, color:"#00ff99", fontWeight:"bold" }}>
-                        {IMPROVEMENT[m]}
-                      </td>
-                    ))}
-                    <td style={styles.td}></td>
-                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* ════════════════════════════════════════
-            TAB 2 — Bar Chart
-            ════════════════════════════════════════ */}
+        {/* CHART TAB */}
         {tab === "chart" && (
           <div style={styles.tableBox}>
             {/* Metric selector */}
-            <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
+            <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
               {METRICS.map(m => (
                 <button key={m} onClick={() => setMetric(m)}
                   style={{
@@ -207,100 +217,57 @@ export default function Performance() {
               ))}
             </div>
 
-            <h3 style={{ color:"#00fff7", marginBottom:4, textShadow:"0 0 10px #00fff7" }}>
+            <h3 style={{ color: "#00fff7", marginBottom: 4, textShadow: "0 0 10px #00fff7" }}>
               {metric} — All Models
             </h3>
-            <p style={{ color:"#888", fontSize:"0.85rem", marginBottom:16 }}>
-              Cyan bar = P2D (our model)
-            </p>
+            <div style={{ display: "flex", gap: 20, marginBottom: 16, flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.82rem", color: "#aaa" }}>
+                <span style={{ color: "#3b82f6" }}>■</span> Baselines
+              </span>
+              <span style={{ fontSize: "0.82rem", color: "#aaa" }}>
+                <span style={{ color: "#a78bfa" }}>■</span> Paper P2D
+              </span>
+              <span style={{ fontSize: "0.82rem", color: "#aaa" }}>
+                <span style={{ color: "#00fff7" }}>■</span> Our model
+              </span>
+            </div>
 
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart data={chartData} margin={{ top:10, right:20, left:0, bottom:50 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="name" angle={-30} textAnchor="end"
-                  tick={{ fontSize:12, fill:"#bbb" }} />
-                <YAxis tickFormatter={v => v.toFixed(3)} tick={{ fontSize:11, fill:"#bbb" }} />
-                <Tooltip
-                  formatter={v => [v.toFixed(3), metric]}
-                  contentStyle={{
-                    background:"#0a0a1e", border:"1px solid #00fff7",
-                    color:"#00fff7", borderRadius:8,
-                  }}
+            <ResponsiveContainer width="100%" height={360}>
+              <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis
+                  dataKey="name"
+                  angle={-35}
+                  textAnchor="end"
+                  tick={{ fontSize: 12, fill: "#bbb" }}
+                  interval={0}
                 />
-                <Bar dataKey="value" radius={[6,6,0,0]}>
+                <YAxis
+                  tickFormatter={v => v.toFixed(3)}
+                  tick={{ fontSize: 11, fill: "#bbb" }}
+                  domain={[0, 'auto']}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  <LabelList
+                    dataKey="value"
+                    position="top"
+                    formatter={v => v.toFixed(3)}
+                    style={{ fontSize: "0.72rem", fill: "#999" }}
+                  />
                   {chartData.map((entry, i) => (
-                    <Cell key={i} fill={entry.isOurs ? "#00fff7" : "#3b82f6"} />
+                    <Cell
+                      key={i}
+                      fill={
+                        entry.isOurs  ? "#00fff7" :
+                        entry.isPaper ? "#a78bfa" :
+                        "#3b82f6"
+                      }
+                    />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* ════════════════════════════════════════
-            TAB 3 — Ablation Study
-            ════════════════════════════════════════ */}
-        {tab === "ablation" && (
-          <div style={styles.tableBox}>
-            <h3 style={{ color:"#00fff7", marginBottom:4, textShadow:"0 0 10px #00fff7" }}>
-              What happens when we remove parts of P2D?
-            </h3>
-            <p style={{ color:"#888", fontSize:"0.85rem", marginBottom:20 }}>
-              Each variant removes one component · Training: <strong style={{ color:"#ccc" }}>20 epochs</strong>
-            </p>
-
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-              {ABLATION.map((row, i) => {
-                const drop = i === 0 ? null
-                  : (((ABLATION[0].ndcg - row.ndcg) / ABLATION[0].ndcg) * 100).toFixed(1);
-                return (
-                  <div key={i} style={{
-                    border:`1px solid ${row.color}`,
-                    borderRadius:10, padding:16,
-                    background:"rgba(0,0,0,0.5)",
-                    boxShadow:`0 0 12px ${row.color}25`,
-                  }}>
-                    <div style={{
-                      display:"flex", justifyContent:"space-between",
-                      alignItems:"center", flexWrap:"wrap", gap:8,
-                    }}>
-                      <div>
-                        <span style={{
-                          fontWeight:"800", color:row.color,
-                          fontSize:"1rem", textShadow:`0 0 8px ${row.color}`,
-                        }}>
-                          {row.name}
-                        </span>
-                        <span style={{ color:"#888", fontSize:"0.85rem", marginLeft:10 }}>
-                          — {row.note}
-                        </span>
-                      </div>
-                      {drop && (
-                        <span style={{
-                          background:"rgba(255,77,77,0.12)", color:"#ff6666",
-                          padding:"4px 12px", borderRadius:20,
-                          fontWeight:"bold", fontSize:"0.85rem",
-                          border:"1px solid #ff4d4d",
-                        }}>
-                          NDCG@10 drops -{drop}%
-                        </span>
-                      )}
-                    </div>
-
-                    <div style={{ display:"flex", gap:24, marginTop:12, flexWrap:"wrap" }}>
-                      {[["AUC", row.auc], ["NDCG@10", row.ndcg], ["Recall@10", row.rec]].map(([label, val]) => (
-                        <div key={label} style={{ textAlign:"center" }}>
-                          <p style={{ color:"#777", fontSize:"0.75rem", margin:"0 0 4px" }}>{label}</p>
-                          <p style={{ fontWeight:"bold", color:"#eee", margin:0, fontSize:"1.05rem" }}>
-                            {val.toFixed(3)}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         )}
 
@@ -309,93 +276,84 @@ export default function Performance() {
   );
 }
 
-// ── Styles (unchanged from your original) ──────────────────────────────────
 const styles = {
   page: {
-    minHeight:"100vh", position:"relative",
-    backgroundImage:`url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80')`,
-    backgroundSize:"cover", backgroundPosition:"center",
-    backgroundAttachment:"fixed",
+    minHeight: "100vh", position: "relative",
+    backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80')`,
+    backgroundSize: "cover", backgroundPosition: "center",
+    backgroundAttachment: "fixed",
   },
   overlay: {
-    position:"fixed", inset:0,
-    background:"rgba(0,0,0,0.92)", zIndex:0,
+    position: "fixed", inset: 0,
+    background: "rgba(0,0,0,0.92)", zIndex: 0,
   },
   content: {
-    position:"relative", zIndex:1,
-    maxWidth:980, margin:"0 auto", padding:"24px",
+    position: "relative", zIndex: 1,
+    maxWidth: 900, margin: "0 auto", padding: "24px",
   },
   headerBox: {
-    background:"rgba(0,0,0,0.7)",
-    border:"1px solid #00fff7",
-    boxShadow:"0 0 30px rgba(0,255,247,0.2)",
-    borderRadius:14, padding:"24px 28px",
-    marginBottom:20, marginTop:16,
+    background: "rgba(0,0,0,0.7)",
+    border: "1px solid #00fff7",
+    boxShadow: "0 0 30px rgba(0,255,247,0.2)",
+    borderRadius: 14, padding: "24px 28px",
+    marginBottom: 20, marginTop: 16,
   },
   heading: {
-    margin:"0 0 6px", color:"#fff",
-    fontSize:"1.9rem", fontWeight:"800",
-    textShadow:"0 0 20px #00fff7",
+    margin: "0 0 6px", color: "#fff",
+    fontSize: "1.9rem", fontWeight: "800",
+    textShadow: "0 0 20px #00fff7",
   },
-  subHeading: { color:"#bbb", margin:0, fontSize:"0.95rem" },
-  epochNote: {
-    background:"rgba(0,255,247,0.05)",
-    border:"1px solid rgba(0,255,247,0.2)",
-    borderRadius:10, padding:"12px 18px",
-    color:"#aaa", fontSize:"0.85rem",
-    marginBottom:20,
-  },
+  subHeading: { color: "#bbb", margin: 0, fontSize: "0.95rem" },
   statsRow: {
-    display:"grid", gridTemplateColumns:"repeat(3,1fr)",
-    gap:16, marginBottom:24,
+    display: "grid", gridTemplateColumns: "repeat(3,1fr)",
+    gap: 16, marginBottom: 24,
   },
   statCard: {
-    background:"rgba(0,0,0,0.75)",
-    border:"1px solid rgba(0,255,247,0.3)",
-    boxShadow:"0 0 16px rgba(0,255,247,0.1)",
-    borderRadius:12, padding:20, textAlign:"center",
+    background: "rgba(0,0,0,0.75)",
+    border: "1px solid rgba(0,255,247,0.3)",
+    boxShadow: "0 0 16px rgba(0,255,247,0.1)",
+    borderRadius: 12, padding: 20, textAlign: "center",
   },
   statLabel: {
-    color:"#bbb", margin:"0 0 8px",
-    fontSize:"0.9rem", letterSpacing:"0.5px",
+    color: "#bbb", margin: "0 0 8px",
+    fontSize: "0.9rem", letterSpacing: "0.5px",
   },
   statValue: {
-    fontSize:"2rem", fontWeight:"800",
-    color:"#fff", margin:"0 0 6px",
-    textShadow:"0 0 14px #00fff7",
+    fontSize: "2rem", fontWeight: "800",
+    color: "#fff", margin: "0 0 6px",
+    textShadow: "0 0 14px #00fff7",
   },
-  statRank: { margin:0, fontSize:"0.82rem", fontWeight:"600" },
-  tabRow: { display:"flex", gap:10, marginBottom:20 },
+  tabRow: { display: "flex", gap: 10, marginBottom: 20 },
   tabBtn: {
-    padding:"10px 22px", borderRadius:8,
-    border:"2px solid #00fff7", cursor:"pointer",
-    fontWeight:"bold", fontSize:"0.9rem",
-    transition:"all 0.2s", letterSpacing:"0.5px",
+    padding: "10px 22px", borderRadius: 8,
+    border: "2px solid #00fff7", cursor: "pointer",
+    fontWeight: "bold", fontSize: "0.9rem",
+    transition: "all 0.2s", letterSpacing: "0.5px",
   },
   tableBox: {
-    background:"rgba(0,0,0,0.80)",
-    border:"1px solid rgba(0,255,247,0.25)",
-    boxShadow:"0 0 20px rgba(0,255,247,0.08)",
-    borderRadius:12, padding:24,
+    background: "rgba(0,0,0,0.80)",
+    border: "1px solid rgba(0,255,247,0.25)",
+    boxShadow: "0 0 20px rgba(0,255,247,0.08)",
+    borderRadius: 12, padding: 24,
   },
-  tableNote: { color:"#999", fontSize:"0.82rem", marginBottom:16 },
+  tableNote: { color: "#999", fontSize: "0.82rem", marginBottom: 16 },
   th: {
-    color:"#00fff7", padding:"13px 12px",
-    textAlign:"center", fontWeight:"700",
-    borderBottom:"2px solid rgba(0,255,247,0.4)",
-    fontSize:"0.85rem", letterSpacing:"0.5px",
-    background:"rgba(0,255,247,0.06)",
-    whiteSpace:"nowrap",
+    color: "#00fff7", padding: "13px 12px",
+    textAlign: "center", fontWeight: "700",
+    borderBottom: "2px solid rgba(0,255,247,0.4)",
+    fontSize: "0.85rem", letterSpacing: "0.5px",
+    background: "rgba(0,255,247,0.06)",
+    whiteSpace: "nowrap",
   },
   td: {
-    padding:"10px 12px", textAlign:"center",
-    borderBottom:"1px solid rgba(255,255,255,0.08)",
-    fontSize:"0.92rem", color:"#e8e8e8",
+    padding: "10px 12px", textAlign: "center",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    fontSize: "0.92rem", color: "#e8e8e8",
   },
   metricBtn: {
-    padding:"7px 14px", borderRadius:20,
-    border:"1px solid #00fff7", cursor:"pointer",
-    fontWeight:"bold", transition:"all 0.2s",
-    fontSize:"0.82rem",
+    padding: "7px 14px", borderRadius: 20,
+    border: "1px solid #00fff7", cursor: "pointer",
+    fontWeight: "bold", transition: "all 0.2s",
+    fontSize: "0.82rem",
   },
 };
