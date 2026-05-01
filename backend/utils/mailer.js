@@ -2,11 +2,22 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,                        // ← switch from service:"gmail" to explicit
   auth: {
-   user: process.env.EMAIL_USER,    // your gmail from Render env
-   pass: process.env.EMAIL_PASS,    // Gmail App Password from Render env
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
+});
+
+// ← ADD THIS — runs once on server startup, shows error in Render logs
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("❌ Mailer config error:", error.message);
+  } else {
+    console.log("✅ Mailer is ready to send emails");
+  }
 });
 
 /**
